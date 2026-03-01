@@ -1,0 +1,66 @@
+<!-- Server config block — swapped into #server-config-panel after generate-server -->
+
+<div class="box">
+  <p class="panel-heading mb-3">
+    Server Config — {{ server.endpoint }}:{{ server.port }}
+  </p>
+
+  <div class="tags mb-2">
+    <span class="tag is-info is-light">Interface: {{ server.interface_name }}</span>
+    <span class="tag is-info is-light">Network: {{ server.network }}.0/24</span>
+    <span class="tag is-info is-light">DNS: {{ server.dns }}</span>
+  </div>
+
+  <div class="field is-grouped">
+    <div class="control">
+      <a class="button is-small is-light" href="/configs/{{ server.id }}">
+        View saved config
+      </a>
+    </div>
+  </div>
+
+  <label class="label is-small">RouterOS Commands</label>
+  <pre class="routeros-config" id="routeros-pre">Generating clients will update peer list below…
+
+/interface wireguard
+add listen-port={{ server.port }} mtu=1420 name={{ server.interface_name }} private-key="{{ server.private_key }}"
+
+/ip firewall filter
+add action=accept chain=input comment="Allow Wireguard from All" dst-port={{ server.port }} protocol=udp
+add action=accept chain=input comment="Allow DNS from Wireguard Users" dst-port=53 in-interface={{ server.interface_name }} protocol=udp
+
+/ip address
+add address={{ server.network }}.1/24 comment="Wireguard Interface" interface={{ server.interface_name }} network={{ server.network }}.0
+
+/interface wireguard peers
+(peer lines will appear after you click Generate Clients)</pre>
+
+  <div class="field mt-4">
+    <label class="label">Public Key</label>
+    <div class="control">
+      <input class="input is-small is-family-monospace" type="text" readonly value="{{ server.public_key }}">
+    </div>
+  </div>
+</div>
+
+<!-- Generate Clients sub-form -->
+<div class="box">
+  <h3 class="subtitle mb-3">Generate Client Configs</h3>
+  <form hx-post="/api/generate-clients"
+        hx-target="#client-list-panel"
+        hx-swap="innerHTML"
+        hx-indicator="#clients-spinner"
+        hx-disabled-elt="find button[type=submit]">
+    <input type="hidden" name="server_id" value="{{ server.id }}">
+    <input type="hidden" name="client_count" value="{{ client_count }}">
+
+    <div class="field">
+      <div class="control">
+        <button class="button is-warning" type="submit">
+          <span>Generate {{ client_count }} Client(s)</span>
+          <span id="clients-spinner" class="htmx-indicator ml-2">⏳</span>
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

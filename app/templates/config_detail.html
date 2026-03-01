@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Config {{ server.endpoint }}:{{ server.port }} — MikroTik WireGuard Generator{% endblock %}
+
+{% block content %}
+<div class="level">
+  <div class="level-left">
+    <h1 class="title">{{ server.endpoint }}:{{ server.port }}</h1>
+  </div>
+  <div class="level-right">
+    <a class="button is-info" href="/api/download/clients/{{ server.id }}">
+      ⬇ Download Client Configs (.zip)
+    </a>
+  </div>
+</div>
+
+<div class="tags mb-4">
+  <span class="tag is-dark">{{ server.interface_name }}</span>
+  <span class="tag is-info is-light">{{ server.network }}.0/24</span>
+  <span class="tag is-light">DNS: {{ server.dns }}</span>
+  <span class="tag is-light">{{ server.clients | length }} client(s)</span>
+  <span class="tag is-light">Created: {{ server.created_at.strftime("%Y-%m-%d %H:%M") }}</span>
+</div>
+
+<div class="columns">
+  <div class="column">
+    <div class="box">
+      <h2 class="subtitle">RouterOS Commands</h2>
+      <pre class="routeros-config">{{ routeros_config }}</pre>
+    </div>
+
+    <div class="box">
+      <h2 class="subtitle">Server Keys</h2>
+      <div class="field">
+        <label class="label is-small">Public Key</label>
+        <input class="input is-small is-family-monospace" type="text" readonly value="{{ server.public_key }}">
+      </div>
+      <div class="field">
+        <label class="label is-small">Private Key (keep secret!)</label>
+        <input class="input is-small is-family-monospace" type="password" readonly value="{{ server.private_key }}"
+               onclick="this.type='text'" title="Click to reveal">
+      </div>
+    </div>
+  </div>
+
+  <div class="column">
+    <h2 class="subtitle">Client Configs</h2>
+    {% if server.clients %}
+      {% for client in server.clients %}
+        {% include "partials/client_card.html" %}
+      {% endfor %}
+    {% else %}
+      <div class="notification is-warning is-light">
+        No clients generated for this server config.
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<a class="button mt-4" href="/configs">← Back to Config List</a>
+{% endblock %}

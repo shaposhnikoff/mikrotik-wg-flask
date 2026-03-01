@@ -1,0 +1,29 @@
+<!-- Client list — swapped into #client-list-panel after generate-clients -->
+
+<div class="box">
+  <div class="level">
+    <div class="level-left">
+      <p class="panel-heading">
+        Client Configs — {{ server.network }}.{{ server.start_ip }}–{{ server.network }}.{{ server.start_ip + clients|length - 1 }}
+      </p>
+    </div>
+    <div class="level-right">
+      <a class="button is-info is-small"
+         href="/api/download/clients/{{ server.id }}">
+        ⬇ Download All (.zip)
+      </a>
+    </div>
+  </div>
+
+  <!-- Updated RouterOS config with peer lines -->
+  <details class="mb-4">
+    <summary class="has-text-weight-semibold is-clickable" style="cursor:pointer">
+      Updated RouterOS Config (with peers)
+    </summary>
+    <pre class="routeros-config mt-2">{{ routeros_config }}</pre>
+  </details>
+</div>
+
+{% for client in clients %}
+  {% include "partials/client_card.html" %}
+{% endfor %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Saved Configs — MikroTik WireGuard Generator{% endblock %}
+
+{% block content %}
+<h1 class="title">Saved Server Configs</h1>
+
+{% if servers %}
+<div class="table-container">
+  <table class="table is-fullwidth is-hoverable is-striped">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Endpoint</th>
+        <th>Port</th>
+        <th>Interface</th>
+        <th>Network</th>
+        <th>Clients</th>
+        <th>Created</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in servers %}
+      <tr>
+        <td>{{ s.id }}</td>
+        <td>{{ s.endpoint }}</td>
+        <td>{{ s.port }}</td>
+        <td>{{ s.interface_name }}</td>
+        <td>{{ s.network }}.0/24</td>
+        <td>{{ s.clients | length }}</td>
+        <td>{{ s.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
+        <td>
+          <a class="button is-small is-info is-light" href="/configs/{{ s.id }}">View</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="notification is-light">
+  No saved configs yet. <a href="/">Generate one</a>.
+</div>
+{% endif %}
+
+<a class="button mt-4" href="/">← Back to Generator</a>
+{% endblock %}

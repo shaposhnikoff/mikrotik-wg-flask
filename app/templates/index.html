@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}MikroTik WireGuard Config Generator{% endblock %}
+
+{% block content %}
+<h1 class="title">MikroTik WireGuard Config Generator</h1>
+
+<div class="columns is-desktop">
+
+  <!-- ============================================================
+       LEFT COLUMN — Form + Server Config panel
+       ============================================================ -->
+  <div class="column">
+
+    <!-- Input form -->
+    <div class="box">
+      <h2 class="subtitle mb-3">Server Parameters</h2>
+      <form hx-post="/api/generate-server"
+            hx-target="#server-config-panel"
+            hx-swap="innerHTML"
+            hx-indicator="#server-spinner"
+            hx-disabled-elt="find button[type=submit]">
+
+        <div class="field is-grouped is-grouped-multiline">
+          <div class="control">
+            <label class="label">Server Endpoint</label>
+            <input class="input" type="text" name="endpoint" value="vpn.yournet.it" required placeholder="vpn.example.com">
+          </div>
+          <div class="control">
+            <label class="label">Port</label>
+            <input class="input" type="number" name="port" value="13231" min="1" max="65535" required style="width:100px">
+          </div>
+          <div class="control">
+            <label class="label">Interface Name</label>
+            <input class="input" type="text" name="interface_name" value="wg0" required style="width:90px">
+          </div>
+        </div>
+
+        <div class="field is-grouped is-grouped-multiline">
+          <div class="control">
+            <label class="label">Network (3-octet prefix)</label>
+            <input class="input" type="text" name="network" value="172.22.0" required placeholder="172.22.0" style="width:130px">
+          </div>
+          <div class="control">
+            <label class="label">Start IP (last octet)</label>
+            <input class="input" type="number" name="start_ip" value="2" min="2" max="253" required style="width:80px">
+          </div>
+          <div class="control">
+            <label class="label">Client Count</label>
+            <input class="input" type="number" name="client_count" value="3" min="1" max="50" required style="width:80px">
+          </div>
+        </div>
+
+        <div class="field is-grouped is-grouped-multiline">
+          <div class="control is-expanded">
+            <label class="label">Allowed Networks</label>
+            <input class="input" type="text" name="allowed_nets" value="192.168.1.0/24,192.168.0.0/24" placeholder="10.0.0.0/8,192.168.1.0/24">
+          </div>
+          <div class="control">
+            <label class="label">DNS</label>
+            <input class="input" type="text" name="dns" value="172.22.0.1" required style="width:150px">
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="control">
+            <button class="button is-primary" type="submit">
+              <span>Generate Server Config</span>
+              <span id="server-spinner" class="htmx-indicator ml-2">
+                <span class="icon is-small">
+                  <i>⏳</i>
+                </span>
+              </span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Server config panel — HTMX swap target -->
+    <div id="server-config-panel">
+      <div class="notification is-light">
+        Fill the form above and click <strong>Generate Server Config</strong> to start.
+      </div>
+    </div>
+
+  </div><!-- /left column -->
+
+  <!-- ============================================================
+       RIGHT COLUMN — Client cards panel
+       ============================================================ -->
+  <div class="column"
+       id="client-list-panel"
+       hx-trigger="serverGenerated from:body"
+       hx-get="/api/clear-clients"
+       hx-swap="innerHTML">
+    <div class="notification is-light">
+      Client configs will appear here after you generate clients.
+    </div>
+  </div><!-- /right column -->
+
+</div><!-- /columns -->
+{% endblock %}
