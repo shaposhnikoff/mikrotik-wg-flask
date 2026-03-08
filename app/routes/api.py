@@ -170,11 +170,15 @@ def download_clients(server_id):
     server = ServerConfig.query.get_or_404(server_id)
     clients = server.clients
 
+    routeros_config = build_server_config(server, clients)
+
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr("server_routeros.rsc", routeros_config)
         for client in clients:
             conf_text = build_client_config(server, client)
             zf.writestr(f"{client.name}.conf", conf_text)
+            zf.writestr(f"{client.name}_qr.png", generate_qr_png(conf_text))
 
     buf.seek(0)
     resp = make_response(buf.read())
