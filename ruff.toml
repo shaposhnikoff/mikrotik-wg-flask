@@ -8,6 +8,8 @@ ignore = [
     "S603",   # subprocess call with untrusted input — intentional in this repo
     "S605",   # start process with shell — intentional in this repo
     "S607",   # start process with partial path — intentional in this repo
+    "B904",
+    "S104",
 ]
 
 [lint.per-file-ignores]
