@@ -11,9 +11,9 @@ class ServerConfig(db.Model):
     endpoint = db.Column(db.String(255), nullable=False)
     port = db.Column(db.Integer, nullable=False)
     interface_name = db.Column(db.String(64), nullable=False)
-    network = db.Column(db.String(16), nullable=False)   # "172.22.0"
-    start_ip = db.Column(db.Integer, nullable=False)     # first client octet
-    allowed_nets = db.Column(db.Text, nullable=False)    # "192.168.1.0/24,..."
+    network = db.Column(db.String(16), nullable=False)  # "172.22.0"
+    start_ip = db.Column(db.Integer, nullable=False)  # first client octet
+    allowed_nets = db.Column(db.Text, nullable=False)  # "192.168.1.0/24,..."
     dns = db.Column(db.String(64), nullable=False)
     private_key = db.Column(db.String(64), nullable=False)
     public_key = db.Column(db.String(64), nullable=False)

@@ -16,6 +16,7 @@ api_bp = Blueprint("api", __name__)
 # Input validation helpers
 # ---------------------------------------------------------------------------
 
+
 def _parse_int(value, name, min_val, max_val):
     """Return int or raise ValueError with a user-friendly message."""
     try:
@@ -35,6 +36,7 @@ def _error_partial(message: str) -> str:
 # POST /api/generate-server
 # ---------------------------------------------------------------------------
 
+
 @api_bp.route("/generate-server", methods=["POST"])
 def generate_server():
     try:
@@ -50,7 +52,9 @@ def generate_server():
             raise ValueError("Network must be a 3-octet prefix, e.g. 172.22.0")
 
         start_ip = _parse_int(request.form.get("start_ip", ""), "Start IP", 2, 253)
-        client_count = _parse_int(request.form.get("client_count", ""), "Client count", 1, 50)
+        client_count = _parse_int(
+            request.form.get("client_count", ""), "Client count", 1, 50
+        )
 
         if start_ip + client_count - 1 > 254:
             raise ValueError(
@@ -82,7 +86,9 @@ def generate_server():
     db.session.commit()
 
     resp = make_response(
-        render_template("partials/server_config.html", server=server, client_count=client_count)
+        render_template(
+            "partials/server_config.html", server=server, client_count=client_count
+        )
     )
     resp.headers["HX-Trigger"] = "serverGenerated"
     return resp
@@ -92,11 +98,14 @@ def generate_server():
 # POST /api/generate-clients
 # ---------------------------------------------------------------------------
 
+
 @api_bp.route("/generate-clients", methods=["POST"])
 def generate_clients():
     try:
         server_id = _parse_int(request.form.get("server_id", ""), "server_id", 1, 2**31)
-        client_count = _parse_int(request.form.get("client_count", ""), "Client count", 1, 50)
+        client_count = _parse_int(
+            request.form.get("client_count", ""), "Client count", 1, 50
+        )
     except ValueError as exc:
         return _error_partial(str(exc)), 422
 
@@ -138,6 +147,7 @@ def generate_clients():
 # GET /api/qr/<client_id>   — inline PNG for <img src>
 # ---------------------------------------------------------------------------
 
+
 @api_bp.route("/qr/<int:client_id>")
 def qr_inline(client_id):
     client = ClientConfig.query.get_or_404(client_id)
@@ -149,6 +159,7 @@ def qr_inline(client_id):
 # ---------------------------------------------------------------------------
 # GET /api/download/qr/<client_id>  — download single QR PNG
 # ---------------------------------------------------------------------------
+
 
 @api_bp.route("/download/qr/<int:client_id>")
 def download_qr(client_id):
@@ -164,6 +175,7 @@ def download_qr(client_id):
 # ---------------------------------------------------------------------------
 # GET /api/download/clients/<server_id>  — ZIP of all client .conf files
 # ---------------------------------------------------------------------------
+
 
 @api_bp.route("/download/clients/<int:server_id>")
 def download_clients(server_id):
@@ -190,6 +202,7 @@ def download_clients(server_id):
 # ---------------------------------------------------------------------------
 # GET /api/clear-clients  — empty swap target on serverGenerated event
 # ---------------------------------------------------------------------------
+
 
 @api_bp.route("/clear-clients")
 def clear_clients():

@@ -20,6 +20,7 @@ def config_list():
 def config_detail(server_id):
     server = ServerConfig.query.get_or_404(server_id)
     from app.services.config_builder import build_server_config
+
     routeros_config = build_server_config(server, server.clients)
     return render_template(
         "config_detail.html",
