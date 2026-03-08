@@ -1,0 +1,42 @@
+---
+extends: default
+
+rules:
+  # Allow longer lines (GitHub Actions workflow files have long uses: lines)
+  line-length:
+    max: 160
+    level: warning
+
+  # Allow extra spaces after colons for alignment (e.g. in with: blocks)
+  colons:
+    max-spaces-before: 0
+    max-spaces-after: -1   # -1 = unlimited (allows alignment)
+
+  # Don't require --- at start of every YAML file
+  document-start:
+    present: false
+
+  # Trailing spaces are errors
+  trailing-spaces: enable
+
+  # Require newline at end of file
+  new-line-at-end-of-file: enable
+
+  # Allow both true/false and yes/no
+  truthy:
+    allowed-values: ["true", "false", "yes", "no", "on", "off"]
+    level: warning
+
+  # Indentation: 2 spaces (GitHub Actions standard)
+  indentation:
+    spaces: 2
+    indent-sequences: whatever   # allow both indented and non-indented sequences
+    check-multi-line-strings: false
+
+  # Allow comments without space only for commented-out code blocks
+  comments:
+    min-spaces-from-content: 1
+    level: warning
+
+  comments-indentation:
+    level: warning

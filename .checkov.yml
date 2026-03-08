@@ -1,0 +1,45 @@
+---
+# Checkov configuration file
+# https://www.checkov.io/2.Basics/CLI%20Command%20Reference.html
+
+# Directories to skip
+skip-path:
+  - .venv
+  - .git
+  - node_modules
+  - .pytest_cache
+  - __pycache__
+  - .mypy_cache
+  - .ruff_cache
+  - tests/test_output
+
+# Frameworks to scan (can be overridden in CI via --framework flag)
+framework:
+  - terraform
+  - secrets
+  - dockerfile
+  - github_actions
+
+# Skip specific checks (add check IDs here as needed)
+# Example: skip-check:
+#   - CKV_GIT_1  # Ensure GitHub organization security settings are enabled
+skip-check: []
+
+# Skip checks by severity
+# skip-severity:
+#   - LOW
+
+# Enable/disable specific checks
+enable-secret-scan-all-files: false
+
+# Output format (overridden by CI)
+output: cli
+
+# Soft fail mode (overridden by CI)
+soft-fail: false
+
+# Compact output
+compact: false
+
+# Quiet mode (reduce verbosity)
+quiet: false

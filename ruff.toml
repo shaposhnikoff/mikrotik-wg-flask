@@ -1,0 +1,22 @@
+line-length = 120
+target-version = "py311"
+
+[lint]
+select = ["E", "F", "I", "B", "UP", "S"]
+ignore = [
+    "E501",   # line too long — handled by line-length setting
+    "S603",   # subprocess call with untrusted input — intentional in this repo
+    "S605",   # start process with shell — intentional in this repo
+    "S607",   # start process with partial path — intentional in this repo
+]
+
+[lint.per-file-ignores]
+# Tests use assert by design — pytest relies on assert rewriting
+# S105/S106 — hardcoded test credentials (fixture values, not real secrets)
+# S108 — temp paths in tests are intentional
+"**/test_*.py" = ["S101", "S103", "S105", "S106", "S108", "S603", "S605", "S607", "F841"]
+"tests/**"     = ["S101", "S103", "S105", "S106", "S108", "S603", "S605", "S607", "F841"]
+
+[format]
+quote-style = "double"
+indent-style = "space"

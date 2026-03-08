@@ -1,0 +1,113 @@
+# calling-repo/.github/workflows/ci.yml
+#
+# Example CI workflow for a consuming repository.
+# Copy this file into your repo's .github/workflows/ directory.
+# Adjust org, python-version, terraform-version, and paths as needed.
+#
+# Pipeline dependency chain:
+#   changes → lint → (terraform ∥ security) → cost
+#
+# Only runs relevant jobs based on what files changed:
+#   - Python/Docker changes  → lint
+#   - Terraform changes      → lint + terraform + security + cost
+#   - Any other changes      → lint only (secrets + yaml)
+
+name: CI
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  id-token: write
+  security-events: write
+  pull-requests: write
+
+jobs:
+  # ── Stage 0: Detect changed files ─────────────────────────────────────────
+  changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+      cancel-in-progress: true
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      terraform: ${{ steps.filter.outputs.terraform }}
+      python:    ${{ steps.filter.outputs.python }}
+      docker:    ${{ steps.filter.outputs.docker }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36  # v3.0.2
+        id: filter
+        with:
+          filters: |
+            terraform:
+              - 'terraform/**'
+              - '**/*.tf'
+              - '**/*.tfvars'
+              - '**/.terraform.lock.hcl'
+            python:
+              - '**/*.py'
+              - 'requirements*.txt'
+              - 'pyproject.toml'
+              - 'setup.cfg'
+            docker:
+              - '**/Dockerfile'
+              - '**/Dockerfile.*'
+              - '**/*.dockerfile'
+
+  # ── Stage 1+2: Lint (secrets, yaml, python, shell, dockerfile, tf) ────────
+  lint:
+    name: Lint
+    needs: changes
+    #uses: org/shared-pipelines/.github/workflows/shared-lint.yml@v1
+    uses: shaposhnikoff/my_shared_pipeline/.github/workflows/shared-lint.yml@main
+    with:
+      python-version:    "3.11"
+      terraform-version: "1.9.x"
+      working-directory: "."
+    secrets: inherit
+
+  # ── Stage 3a: Terraform validate + tflint ─────────────────────────────────
+  terraform:
+    name: Terraform
+    needs: [lint, changes]
+    #uses: org/shared-pipelines/.github/workflows/shared-terraform.yml@v1
+    uses: shaposhnikoff/my_shared_pipeline/.github/workflows/shared-terraform.yml@main
+    with:
+      terraform-version: "1.9.x"
+      working-directory: "."
+      aws-role-arn: ${{ vars.AWS_ROLE_ARN }}  # set in repo/org Variables (not Secrets)
+    secrets: inherit
+
+  # ── Stage 3b: Security (checkov + trivy) ──────────────────────────────────
+  security:
+    name: Security
+    needs: [lint, changes]
+    #uses: org/shared-pipelines/.github/workflows/shared-security.yml@v1
+    uses: shaposhnikoff/my_shared_pipeline/.github/workflows/shared-security.yml@main
+    with:
+      working-directory: "."
+      fail-on-severity: "HIGH"
+    secrets: inherit
+
+  # ── Stage 4: Cost estimation (advisory, PR only) ──────────────────────────
+  cost:
+    name: Cost
+    needs: [terraform, security, changes]
+    if: github.event_name == 'pull_request'
+    #uses: org/shared-pipelines/.github/workflows/shared-cost.yml@v1
+    uses: shaposhnikoff/my_shared_pipeline/.github/workflows/shared-cost.yml@main
+    with:
+      terraform-dir: "."
+      aws-role-arn:  ${{ vars.AWS_ROLE_ARN }}
+    secrets:
+      infracost-api-key: ${{ secrets.INFRACOST_API_KEY }}

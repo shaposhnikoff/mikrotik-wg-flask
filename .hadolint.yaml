@@ -1,0 +1,21 @@
+---
+# .hadolint.yaml
+# Hadolint configuration for Dockerfile linting
+# Reference: https://github.com/hadolint/hadolint#configure
+
+# Rules to ignore globally
+ignore:
+  - DL3008  # Pin versions in apt-get install — too strict for dev images
+  - DL3009  # Delete apt-get lists — not always needed
+  - DL3015  # Avoid additional packages with --no-install-recommends — warning only
+  - SC2046  # Quote expansion — allow in some cases
+
+# Treat these as warnings instead of errors
+failure-threshold: error  # Only fail on error-level findings (not warning/info/style)
+
+# Trusted registries (images from these don't need pinning)
+trustedRegistries:
+  - docker.io
+  - gcr.io
+  - ghcr.io
+  - public.ecr.aws
