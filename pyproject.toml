@@ -7,3 +7,38 @@ requires-python = ">=3.9"
 dependencies = [
     "ruff>=0.15.5",
 ]
+
+
+
+[tool.black]
+line-length = 88
+target-version = ["py310", "py311"]
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.direnv
+
+  | \.eggs
+  | \.git
+  | \.hg
+
+  | \.mypy_cache
+  | \.nox
+  | \.tox
+
+  | \.venv
+  | venv
+  | _build
+
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+
+
+
+
+
+
