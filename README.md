@@ -19,14 +19,14 @@ This is a Python rewrite of the [original client-side Vue.js app](https://github
 ```
 ┌─────────────────────────────┬──────────────────────────────┐
 │  Server Parameters (form)   │  Client Configs              │
-│                             │  ┌──────────────────────┐   │
-│  [Generate Server Config]   │  │ ▓▓▓▓ QR ▓▓▓▓  conf  │   │
-│                             │  │ Client_2  172.22.0.2 │   │
-│  RouterOS Commands          │  └──────────────────────┘   │
-│  /interface wireguard ...   │  ┌──────────────────────┐   │
-│                             │  │ ▓▓▓▓ QR ▓▓▓▓  conf  │   │
-│  [Generate 3 Clients]       │  │ Client_3  172.22.0.3 │   │
-│                             │  └──────────────────────┘   │
+│                             │  ┌──────────────────────┐    │
+│  [Generate Server Config]   │  │ ▓▓▓▓ QR ▓▓▓▓  conf   │    │
+│                             │  │ Client_2  172.22.0.2 │    │
+│  RouterOS Commands          │  └──────────────────────┘    │
+│  /interface wireguard ...   │  ┌──────────────────────┐    │
+│                             │  │ ▓▓▓▓ QR ▓▓▓▓  conf   │    │
+│  [Generate 3 Clients]       │  │ Client_3  172.22.0.3 │    │
+│                             │  └──────────────────────┘    │
 └─────────────────────────────┴──────────────────────────────┘
 ```
 
